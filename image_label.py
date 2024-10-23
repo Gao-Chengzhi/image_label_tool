@@ -31,7 +31,8 @@ def Classification_Tools(num_cls):
     labelled_images = resume()
     with open('test.csv', mode='a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['id', 'prediction'])
+        if len(labelled_images) == 0:
+            writer.writerow(['id', 'prediction'])
         data_dir = unlabelled_image_dir   # 待分类数据路径
         if not os.path.exists(data_dir):
             print('data_dir not exists, please put data to: ', data_dir)
