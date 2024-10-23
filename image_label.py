@@ -12,22 +12,29 @@ root_dir = os.getcwd()
 # os.path.abspath()获得绝对路径
 root_absdir = os.path.abspath(os.path.dirname(__file__))
 # print(root_absdir)
-
+# 待标注图片路径
+unlabelled_image_dir = './data_all/' 
 
 def make_dirs2(n):
-    if not os.path.exists(os.path.join(root_dir, n)):
-        os.makedirs(os.path.join(root_dir, n))
+    if not os.path.exists(os.path.join(root_dir,'labelled_images', n)):
+        os.makedirs(os.path.join(root_dir, 'labelled_images', n))
 
-
+def resume():
+    labelled_images = []
+    if os.path.exists(os.path.join(root_dir,'labelled_images')):
+        cls_list = os.listdir(os.path.join(root_dir,'labelled_images'))
+        for c in cls_list:
+            image_list = os.listdir(os.path.join(root_dir,'labelled_images',c))
+            labelled_images.extend(image_list)
+    return labelled_images
 def Classification_Tools(num_cls):
-    # list0 = os.listdir('./0')
-    # list1 = os.listdir('./1')
+    labelled_images = resume()
     with open('test.csv', mode='a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['id', 'prediction'])
-        data_dir = './data_all/'   # 待分类数据路径
+        data_dir = unlabelled_image_dir   # 待分类数据路径
         if not os.path.exists(data_dir):
-            print('data_all not exists, please put data to: ', data_dir)
+            print('data_dir not exists, please put data to: ', data_dir)
             time.sleep(5)
             exit()
         unconfirmed = 'unconfirmed'  # 不确定数据存放路径
@@ -47,7 +54,7 @@ def Classification_Tools(num_cls):
             print('i', i)
             image_path = os.path.join(data_dir, image_list[i])
             print(image_path)
-            if image_path in list0 or image_path in list1:
+            if image_path in labelled_images:
                 continue
             image = imread(image_path)
             print(image.shape)
@@ -56,7 +63,7 @@ def Classification_Tools(num_cls):
 
             if key == ord('d'):
                 coccus_label = 'unconfirmed'
-                shutil.move(image_path, os.path.join(root_dir, unconfirmed))
+                shutil.move(image_path, os.path.join(root_dir, 'labelled_images', unconfirmed))
                 i += 1  # (i + 1) % len(image_list)
             if key in rightkeys:
                 i += 1  # (i + 1) % len(image_list)
@@ -65,7 +72,7 @@ def Classification_Tools(num_cls):
                 print('leftkeys:', os.path.join(('./' + str(coccus_label)), image_list[i - 1]))
                 if os.path.exists(os.path.join(('./' + str(coccus_label)), image_list[i - 1])):
                     print('ssssssssssssss', os.path.join(('./' + str(coccus_label)), image_list[i - 1]))
-                    shutil.move(os.path.join(('./' + str(coccus_label)), image_list[i - 1]), data_dir)
+                    shutil.move(os.path.join(('./' + 'labelled_images/' + str(coccus_label)), image_list[i - 1]), data_dir)
                 i -= 1
                 if i < 0:
                     i = len(image_list) - 1
@@ -78,7 +85,7 @@ def Classification_Tools(num_cls):
                     coccus_label = str(j)
                 
                     writer.writerow([image_list[i], coccus_label])
-                    shutil.move(image_path, os.path.join(root_dir, str(j)))
+                    shutil.move(image_path, os.path.join(root_dir, 'labelled_images/', str(j)))
                     i += 1  # (i + 1) % len(image_list)
                     break
 
